@@ -62,7 +62,19 @@ def check_prices_and_notify(tracker: PriceTracker, notifier: Notifier):
             print(f"     ⚠️  Baseline not set. Run with --set-baseline to set it.")
             continue
         
-        # Check for alerts
+        # Check if price went UP - update baseline to track from new high
+        if summary['drop_percentage'] is not None and summary['drop_percentage'] < -5:
+            # Price is MORE than 5% ABOVE baseline (negative drop = price increase)
+            old_baseline = summary['baseline_price']
+            new_baseline = price_data.display_price
+            tracker.set_baseline(metal, new_baseline)
+            print(f"     📈 Price went UP! Baseline updated: ₹{old_baseline:.2f} → ₹{new_baseline:.2f}")
+            print(f"     🎯 Now tracking drops from new high price")
+            # Update summary with new baseline for any alerts
+            summary['baseline_price'] = new_baseline
+            summary['drop_percentage'] = 0
+        
+        # Check for alerts (price drops)
         alerts = tracker.check_alerts(metal, price_data.display_price)
         
         for threshold in alerts:
