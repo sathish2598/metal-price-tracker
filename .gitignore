@@ -11,9 +11,7 @@ env/
 venv/
 .venv/
 
-# State files (will be managed by GitHub Actions cache or secrets)
-baseline_prices.json
-alert_state.json
+# State files are now tracked in repo for persistence
 
 # IDE
 .vscode/
