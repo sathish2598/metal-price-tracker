@@ -1,9 +1,9 @@
 name: Metal Price Tracker
 
 on:
-  # Run every 30 minutes
+  # Run every 10 minutes
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/10 * * * *'
   
   # Allow manual trigger
   workflow_dispatch:
