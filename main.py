@@ -5,6 +5,10 @@ Metal Price Tracker - Main Entry Point
 Monitors gold and silver prices from Aura Gold API and sends
 notifications when prices drop by 10% or 20% from baseline.
 
+SIP-Style Alerts: After each alert, the baseline automatically updates
+to the current price, allowing you to receive alerts for every 10%/20%
+drop (useful for buying in stages as prices fall).
+
 Usage:
     python main.py              # Run once and check prices
     python main.py --daemon     # Run continuously with scheduled checks
@@ -75,6 +79,16 @@ def check_prices_and_notify(tracker: PriceTracker, notifier: Notifier):
                     print(f"     ✅ SMS notification sent")
                 if not results["email"] and not results["sms"]:
                     print(f"     ⚠️  No notifications sent (check configuration)")
+                
+                # SIP-style: Auto-update baseline after alert is sent
+                # This allows receiving alerts for the next 10%/20% drop
+                if results["email"] or results["sms"]:
+                    old_baseline = summary['baseline_price']
+                    new_baseline = price_data.display_price
+                    tracker.set_baseline(metal, new_baseline)
+                    notifier.reset_alerts(metal)
+                    print(f"     📊 Baseline updated: ₹{old_baseline:.2f} → ₹{new_baseline:.2f}")
+                    print(f"     🔄 Ready for next {threshold}% drop alert")
 
 
 def set_baseline(tracker: PriceTracker, notifier: Notifier):
